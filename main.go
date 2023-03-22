@@ -10,6 +10,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alecthomas/chroma/v2"
+	"github.com/alecthomas/chroma/v2/formatters"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/bmaupin/go-epub"
 )
 
@@ -54,18 +58,39 @@ var tpl = template.Must(template.New("page").Parse(rawTemplate))
 
 type templateData struct {
 	Filename string
-	Code     string
+	Code     template.HTML
 }
 
 func mustGetXHTMLContent(filename string) string {
 	b := new(strings.Builder)
-	code := mustReadFile(filename)
+	rawCode := mustReadFile(filename)
+	hlCode := template.HTML(mustHighlightCode(filename, rawCode))
 	err := tpl.Execute(b, templateData{
 		Filename: filename,
-		Code:     code,
+		Code:     hlCode,
 	})
 	if err != nil {
 		log.Fatalf("Error executing template: %s", err)
+	}
+	return b.String()
+}
+
+func mustHighlightCode(filename, code string) string {
+	lexer := lexers.Match(filename)
+	if lexer == nil {
+		lexer = lexers.Fallback
+	}
+	lexer = chroma.Coalesce(lexer)
+	style := styles.Get("bw")
+	formatter := formatters.Get("html")
+	iterator, err := lexer.Tokenise(nil, code)
+	if err != nil {
+		log.Fatalf("Error in lexer: %s", err)
+	}
+	b := new(strings.Builder)
+	err = formatter.Format(b, style, iterator)
+	if err != nil {
+		log.Fatalf("Error in formatter: %s", err)
 	}
 	return b.String()
 }
