@@ -1,17 +1,35 @@
-# SourceCodeX
+# SourceCodex
 
 A program to convert source code repos to epubs.
 
-## Example
+## Examples
+
+The program receives as input the filenames to include:
 
 ```bash
-$ fd -e go | git ls-files | sourcecodex
+$ fd -e go | sourcecodex
+```
+
+Here's another example with more filters and files sorted by last modification date:
+
+```bash
+$ git ls-tree -r --name-only HEAD \
+    | grep -E "\.ts$" \
+    | grep -v -E "(^test|__test__|\.d\.ts$)" \
+    | xargs -I{} git log -1 --format="%at {}" -- {} \
+    | sort -n -r \
+    | cut -d " " -f2- \
+    | sourcecodex
 ```
 
 ## To-do
 
--   Generate epub
+-   Set metadata
+-   Generate a cover
 -   Syntax highlighting
 -   Add links between files (like a dependency graph)
 -   Add an index for symbols, with links to its definition, and references
 -   Link symbols in the code to their entry on the index
+-   Sort files with a recommended reading order
+-   Autoformat code for a better ebook reading experience
+-   Add line numbers
