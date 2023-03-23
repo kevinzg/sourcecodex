@@ -2,6 +2,10 @@
 
 A program to convert source code repos to epubs.
 
+## Features
+
+-   Syntax highlighting
+
 ## Examples
 
 The program receives as input the filenames to include:
@@ -24,12 +28,10 @@ $ git ls-tree -r --name-only HEAD \
 
 ## To-do
 
--   Set metadata
--   Generate a cover
--   Syntax highlighting
 -   Add links between files (like a dependency graph)
 -   Add an index for symbols, with links to its definition, and references
 -   Link symbols in the code to their entry on the index
 -   Sort files with a recommended reading order
 -   Autoformat code for a better ebook reading experience
 -   Add line numbers
+-   Generate a cover
