@@ -4,6 +4,7 @@ import (
 	_ "embed"
 
 	"bufio"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -18,6 +19,16 @@ import (
 )
 
 func main() {
+	title := flag.String("title", "SourceCodex", "Title of the EPUB")
+	author := flag.String("author", "Unknown", "Author of the EPUB")
+	output := flag.String("output", "book.epub", "Output file")
+
+	flag.Parse()
+
+	log.Printf("Title: %s", *title)
+	log.Printf("Author: %s", *author)
+	log.Printf("Output: %s", *output)
+
 	filenames := make([]string, 0)
 
 	// Read the files to include from stdin
@@ -28,15 +39,16 @@ func main() {
 	}
 
 	// Create epub
-	book := mustBuildEpub("Source code", "Author", filenames)
-	err := book.Write("book.epub")
+	book := mustBuildEpub(*title, *author, filenames)
+	err := book.Write(*output)
 	if err != nil {
 		log.Printf("Error building epub: %s", err)
 	}
 }
 
 func mustBuildEpub(title string, author string, filenames []string) *epub.Epub {
-	book := epub.NewEpub("Source code")
+	book := epub.NewEpub(title)
+	book.SetAuthor(author)
 
 	for i, filename := range filenames {
 		content := mustGetXHTMLContent(filename)
