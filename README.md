@@ -10,16 +10,16 @@ The program receives as input the filenames to include:
 $ fd -e go | sourcecodex
 ```
 
-Here's another example with more filters and files sorted by last modification date:
+Here's another example with more filters and files sorted by last commit date:
 
 ```bash
 $ git ls-tree -r --name-only HEAD \
-    | grep -E "\.ts$" \
-    | grep -v -E "(^test|__test__|\.d\.ts$)" \
-    | xargs -I{} git log -1 --format="%at {}" -- {} \
+    | grep -E '\.ts$' \
+    | grep -v -E '(^test|__test__|\.test\.\w+$|\.d\.ts$)' \
+    | xargs -I{} git log -1 --format='%at {}' -- {} \
     | sort -n -r \
-    | cut -d " " -f2- \
-    | sourcecodex
+    | cut -d ' ' -f2- \
+    | sourcecodex -title "Cool project" -author "Cool author" -output "source.epub"
 ```
 
 ## To-do
