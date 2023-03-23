@@ -4,6 +4,8 @@ import (
 	_ "embed"
 
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"html/template"
@@ -49,6 +51,8 @@ func main() {
 func mustBuildEpub(title string, author string, filenames []string) *epub.Epub {
 	book := epub.NewEpub(title)
 	book.SetAuthor(author)
+	// Generate an id based on the title and author
+	book.SetIdentifier(generateID(title, author))
 
 	for i, filename := range filenames {
 		content := mustGetXHTMLContent(filename)
@@ -113,4 +117,10 @@ func mustReadFile(name string) string {
 		log.Fatalf("Cannot read file %s: %s", name, err)
 	}
 	return string(b)
+}
+
+func generateID(title, author string) string {
+	s := fmt.Sprintf("%s | %s", title, author)
+	hash := sha256.Sum256([]byte(s))
+	return hex.EncodeToString(hash[:])
 }
